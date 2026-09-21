@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const pool = require('../config/db');
+const pool = require('../db');
 const router = express.Router();
 
 // -------------------------------------------------------------
