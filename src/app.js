@@ -39,15 +39,15 @@ cron.schedule('59 23 * * *', async () => {
   console.log('[CRON] Ejecutando marca automática de empleados ausentes...');
   try {
     const query = `
-      INSERT INTO asistencias (usuario_id, area_id, fecha, estado)
+      INSERT INTO "ASISTENCIAS" (usuario_id, area_id, fecha, estado)
       SELECT u.id, NULL, CURRENT_DATE, 'AUSENTE'
-      FROM usuarios u
+      FROM "USUARIOS" u
       WHERE u.id NOT IN (
-        SELECT usuario_id FROM asistencias WHERE fecha = CURRENT_DATE
+        SELECT usuario_id FROM "ASISTENCIAS" WHERE fecha = CURRENT_DATE
       );
     `;
     const result = await pool.query(query);
-    console.log(`[CRON] Exitoso: ${result.rowCount} marcas de ausencia creadas para el día de hoy.`);
+    console.log(`[CRON] Exitoso: ${result.rowCount} marcas de ausencia creadas.`);
   } catch (err) {
     console.error('[CRON Error]: Fallo al marcar las inasistencias:', err);
   }
