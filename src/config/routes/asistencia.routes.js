@@ -27,7 +27,7 @@ router.post(
       const query = `
         SELECT id, codigo_empleado, nombre, apellido, 
                (face_embedding <=> $1) AS distancia
-        FROM usuarios
+        FROM USUARIOS
         WHERE (face_embedding <=> $1) < 0.38
         ORDER BY distancia ASC
         LIMIT 1;
@@ -76,7 +76,7 @@ router.post(
       const { usuario_id, area_id } = req.body;
 
       const query = `
-        INSERT INTO asistencias (usuario_id, area_id, fecha, hora_entrada, estado)
+        INSERT INTO ASISTENCIAS (usuario_id, area_id, fecha, hora_entrada, estado)
         VALUES ($1, $2, CURRENT_DATE, CURRENT_TIME, 'PRESENTE')
         ON CONFLICT (usuario_id, fecha) 
         DO UPDATE SET area_id = EXCLUDED.area_id, hora_entrada = EXCLUDED.hora_entrada, estado = 'PRESENTE'
