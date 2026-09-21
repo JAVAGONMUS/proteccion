@@ -3,9 +3,9 @@ const helmet = require('helmet');
 const cors = require('cors');
 const cron = require('node-cron');
 const pool = require('./config/db');
-const verifyApiKey = require('./middleware/auth');
-const { apiLimiter } = require('./middleware/rateLimiter');
-const asistenciaRoutes = require('./routes/asistencia.routes');
+const verifyApiKey = require('./config/middleware/auth');
+const { apiLimiter } = require('./config/middleware/rateLimiter');
+const asistenciaRoutes = require('./config/routes/asistencia.routes');
 
 const app = express();
 
