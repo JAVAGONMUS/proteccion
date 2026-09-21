@@ -4,7 +4,7 @@ const pool = require('../config/db');
 const router = express.Router();
 
 // -------------------------------------------------------------
-// 1. IDENTIFICACIÓN FACIAL MEDIANTE VECTOR (512 FLOATS)
+// 1. IDENTIFICACIÓN FACIAL (Búsqueda Vectorial HNSW)
 // -------------------------------------------------------------
 router.post(
   '/identificar',
@@ -23,24 +23,24 @@ router.post(
       const { embedding } = req.body;
       const vectorString = JSON.stringify(embedding);
 
-      // Distancia Coseno (<=>). Umbral seguro: < 0.38
-      const query = `
+      // Tablas en mayúsculas entre comillas dobles: "USUARIOS" y "PUESTOS"
+      const queryUser = `
         SELECT id, codigo_empleado, nombre, apellido, 
                (face_embedding <=> $1) AS distancia
-        FROM USUARIOS
+        FROM "USUARIOS"
         WHERE (face_embedding <=> $1) < 0.38
         ORDER BY distancia ASC
         LIMIT 1;
       `;
 
-      const result = await pool.query(query, [vectorString]);
+      const result = await pool.query(queryUser, [vectorString]);
 
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'Rostro no reconocido o sin nivel de coincidencia seguro.' });
       }
 
       const usuario = result.rows[0];
-      const areas = await pool.query('SELECT id, nombre FROM areas_trabajo ORDER BY nombre ASC');
+      const puestos = await pool.query('SELECT id, nombre FROM "PUESTOS" ORDER BY nombre ASC');
 
       return res.json({
         empleado: {
@@ -48,7 +48,7 @@ router.post(
           codigo: usuario.codigo_empleado,
           nombre: `${usuario.nombre} ${usuario.apellido}`
         },
-        areas: areas.rows
+        areas: puestos.rows
       });
     } catch (err) {
       console.error('Error procesando el vector de rostros:', err);
@@ -75,8 +75,9 @@ router.post(
     try {
       const { usuario_id, area_id } = req.body;
 
+      // Tabla "ASISTENCIAS" en mayúsculas
       const query = `
-        INSERT INTO ASISTENCIAS (usuario_id, area_id, fecha, hora_entrada, estado)
+        INSERT INTO "ASISTENCIAS" (usuario_id, area_id, fecha, hora_entrada, estado)
         VALUES ($1, $2, CURRENT_DATE, CURRENT_TIME, 'PRESENTE')
         ON CONFLICT (usuario_id, fecha) 
         DO UPDATE SET area_id = EXCLUDED.area_id, hora_entrada = EXCLUDED.hora_entrada, estado = 'PRESENTE'
