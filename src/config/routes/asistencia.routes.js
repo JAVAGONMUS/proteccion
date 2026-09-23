@@ -9,7 +9,7 @@ const router = express.Router();
 // 1. IDENTIFICACIÓN FACIAL (Búsqueda Vectorial HNSW)
 // -------------------------------------------------------------
 router.post(
-  '/asistencia/identificar',
+  '/identificar',
   [
     body('embedding')
       .isArray({ min: 512, max: 512 })
@@ -63,7 +63,7 @@ router.post(
 // 2. MARCAR ASISTENCIA Y ASIGNAR PUESTO
 // -------------------------------------------------------------
 router.post(
-  '/asistencia/marcar',
+  '/marcar',
   [
     body('usuario_id').isInt().withMessage('El id de usuario debe ser entero.'),
     body('area_id').isInt().withMessage('El id de área debe ser entero.')
