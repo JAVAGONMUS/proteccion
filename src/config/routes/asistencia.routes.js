@@ -1,3 +1,5 @@
+//  ../src/config/routes/asistencia.routes.js
+
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const pool = require('../db');
@@ -7,7 +9,7 @@ const router = express.Router();
 // 1. IDENTIFICACIÓN FACIAL (Búsqueda Vectorial HNSW)
 // -------------------------------------------------------------
 router.post(
-  '/identificar',
+  '/asistencia/identificar',
   [
     body('embedding')
       .isArray({ min: 512, max: 512 })
@@ -61,7 +63,7 @@ router.post(
 // 2. MARCAR ASISTENCIA Y ASIGNAR PUESTO
 // -------------------------------------------------------------
 router.post(
-  '/marcar',
+  '/asistencia/marcar',
   [
     body('usuario_id').isInt().withMessage('El id de usuario debe ser entero.'),
     body('area_id').isInt().withMessage('El id de área debe ser entero.')
