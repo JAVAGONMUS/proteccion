@@ -1,3 +1,4 @@
+// src/app.js
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -5,7 +6,10 @@ const cron = require('node-cron');
 const pool = require('./config/db');
 const verifyApiKey = require('./config/middleware/auth');
 const { apiLimiter } = require('./config/middleware/rateLimiter');
+
+// Importar rutas
 const asistenciaRoutes = require('./config/routes/asistencia.routes');
+const usuariosRoutes = require('./config/routes/usuarios.routes');
 
 const app = express();
 
@@ -14,26 +18,26 @@ app.use(helmet());
 
 // 2. Protección de Dominios Cruzados (CORS)
 app.use(cors({
-  origin: '*', // Se ajusta al dominio del dashboard web o se deja abierto si es consumido solo desde Apps nativas
+  origin: '*',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'x-api-key']
 }));
 
-// 3. Parser de JSON con restricción de tamaño para evitar desbordamiento de memoria
+// 3. Parser de JSON con restricción de tamaño
 app.use(express.json({ limit: '1mb' }));
 
 // 4. Aplicación global de Rate Limiting
 app.use('/api/', apiLimiter);
 
 // 5. Aplicación del Middleware de Autenticación por API Key
-app.use('/api/', verifyApiKey);
+app.use(verifyApiKey);
 
 // 6. Registro de Rutas
-app.use('/api/asistencia', asistenciaRoutes);
+app.use('/asistencia', asistenciaRoutes);
+app.use('/usuarios', usuariosRoutes);
 
 // -------------------------------------------------------------
 // AUTOMATIZACIÓN (CRON JOB): Registro diario de Inasistencias
-// Corre automáticamente a las 23:59 todos los días
 // -------------------------------------------------------------
 cron.schedule('59 23 * * *', async () => {
   console.log('[CRON] Ejecutando marca automática de empleados ausentes...');
